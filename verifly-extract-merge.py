@@ -39,7 +39,7 @@ def date_yesterday():
     today = datetime.date.today()
     return str(today - datetime.timedelta(days=1))
     
-path = '/Users/nas/Documents/growboat/data/series/'
-yesterday = date_yesterday()
-csv_paths = get_paths(path, yesterday)
-csv_df = open_and_join(csv_paths)
+def get_yesterday_csvs(apath):
+    yesterday = date_yesterday()
+    csv_paths = get_paths(path, yesterday)
+    return open_and_join(csv_paths)
