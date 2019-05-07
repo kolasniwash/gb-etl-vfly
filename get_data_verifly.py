@@ -7,7 +7,7 @@ import os
 import shutil
 
 #consruct client and login to goolge api
-credentials = service_account.Credentials.from_service_account_file('/Users/nas/Documents/growboat/verifly/keys/verifly-237116-82a9642924f2.json')
+credentials = service_account.Credentials.from_service_account_file('/home/nick/adjust/keys/vfly/verifly-237116-82a9642924f2.json')
 project_id = 'verifly-237116'
 client = storage.Client(credentials = credentials, project = project_id)
 
@@ -18,10 +18,9 @@ def gcs_list_blobs(bucket_name):
     bucket = storage_client.get_bucket(bucket_name)
 
     blobs = bucket.list_blobs()
-    
+
     blob_list = []
     for blob in blobs:
-        #print(blob.name)
         blob_list.append(blob.name)
     return blob_list
 
@@ -72,7 +71,7 @@ def open_and_join(alist):
         final_df = pd.concat([final_df, to_add], ignore_index = True)
     print('All files read.')
     return final_df
-    
+
 #main function. inputs are a bucket, a number (representing a day refrenced from today), and a path to save the files.
 #pulls and combined 24 worth of batched data from google cloud verifly account.
 #files are saved in a folder with the date for when they are pulled.
@@ -89,13 +88,13 @@ def get_data_verifly(bucket, anint, apath):
     file_list = files_to_download(file_list, date)
 
     file_path = apath + '/' + date + '/'
-    
+
     if os.path.exists(file_path):
         shutil.rmtree(file_path)
         os.mkdir(file_path)
     else:
         os.mkdir(file_path)
-    
+
     for file in file_list:
         save_path = file_path + file
 #         print(file)
@@ -103,8 +102,8 @@ def get_data_verifly(bucket, anint, apath):
 #         print("")
 #         print("")
         gcs_download_blob(bucket, file, save_path)
-    
+
     data_paths = get_paths(file_path)
-    
+
     return open_and_join(data_paths)
-    
+
