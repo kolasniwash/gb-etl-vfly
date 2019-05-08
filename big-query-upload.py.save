@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
 
 	'''
-	The main script function called daily via a cron on a google VM.
+	The main script function called daily via a cron on a google VM. 
 	Function runs the extract, and transform scripts.
 	Joins the result with the most recent version from GBQ and reuploads the result
 	'''
@@ -32,21 +32,21 @@ if __name__ == "__main__":
 	print("Local path: " + local_path)
 
 	#download old data as dataframe from google big query
-	dataset_ref = client.dataset(dataset_id).table(table_name_bigquery)
-	table = client.get_table(dataset_ref)
-	data_gbq = client.list_rows(table).to_dataframe()
-	print("Downloading previous data from google big query...")
+        dataset_ref = client.dataset(dataset_id).table(table_name_bigquery)
+        table = client.get_table(dataset_ref)
+        data_from_gbq = client.list_rows(table).to_dataframe()
+        print("Downloading data from gbq...")
 
 
-#	#drop the pandas index that is added when uploading to gbq
-	data_gbq = data_gbq.iloc[:,1:]
+#	#boolean mask to extract any dates that are older than 30 days
+#	data = data.iloc[:,1:]
 #	data_prev30 = data[data['date'] < last30]
 
 
 	#details for data extraction
 	bucket = "verifly-adjust"
 	day = 1
-	save_path = '/home/nick/adjust/data/verifly'
+	save_path = '/home/nick/adjust/data/verifly/'
 
 
 	#download and combine batched data from yesterday
@@ -56,24 +56,13 @@ if __name__ == "__main__":
 	tm.calc_deliverables(data_yesterday).to_csv("deliverables_" + str(yesterday) + ".csv")
 
 	#combine the two csv files. data was saved as csv as a poor solution to merging a multiindexed dataframe
-#	data_gbq = pd.read_csv('/home/nick/adjust/data/verifly/deliverables/vfly-deliverables.csv')
-#	data_gbq = data_gbq.iloc[:,1:]
-
-
-#	print('base data ')
-#	print(data_gbq.columns) 
+#	gbq_data = pd.read_csv('/home/nick/adjust/data/verifly/deliverables/vfly-deliverables.csv')
 	data_yesterday = pd.read_csv("deliverables_" + str(yesterday) + ".csv")
 
-#	print('data yesterday ')
-#	print(data_yesterday.columns)
-
-	data_full = pd.concat([data_gbq, data_yesterday], ignore_index = True)
-
-#	print('full dataset ')
-#	print(data_full.columns)
+#	data_full = gbq_data.append(data_yesterday, ignore_index = True)
 
 	#save the dataframe as local file
-	data_full.to_csv(local_path)
+#	data_full.to_csv(local_path)
 
 	#try to delete previous table. if failed catch the fail and notify
 	try:
@@ -100,4 +89,3 @@ if __name__ == "__main__":
 	job.result()  # Waits for table load to complete.
 
 	print('Loaded {} rows into project: {} dataset: {} table: {}.'.format(job.output_rows, project_id, dataset_id, table_name_bigquery))
-
