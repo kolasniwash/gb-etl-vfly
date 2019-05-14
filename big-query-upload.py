@@ -53,7 +53,7 @@ if __name__ == "__main__":
 	data_yesterday = gdv.get_data_verifly(bucket, day, save_path)
 
 	#transform batched data to metrics and save as csv
-	tm.calc_deliverables(data_yesterday).to_csv("deliverables_" + str(yesterday) + ".csv")
+	data_yesterday = tm.calc_deliverables(data_yesterday)
 
 	#combine the two csv files. data was saved as csv as a poor solution to merging a multiindexed dataframe
 #	data_gbq = pd.read_csv('/home/nick/adjust/data/verifly/deliverables/vfly-deliverables.csv')
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
 #	print('base data ')
 #	print(data_gbq.columns) 
-	data_yesterday = pd.read_csv("deliverables_" + str(yesterday) + ".csv")
+#	data_yesterday = pd.read_csv("deliverables_" + str(yesterday) + ".csv")
 
 #	print('data yesterday ')
 #	print(data_yesterday.columns)
