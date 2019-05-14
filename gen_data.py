@@ -10,7 +10,7 @@ if __name__ == "__main__":
 #	days3 = datetime.date.today() - datetime.timedelta(days = 3)
 #	days2 = datetime.date.today() - datetime.timedelta(days = 2)
 
-	days = [2,3,4,5,6,7]
+	days = [2,3,4,5,6,7,8,9,10]
 
 	for day in days:
 		data = gdf.get_data_verifly(bucket, day, save_path)
