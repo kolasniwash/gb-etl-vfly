@@ -1,22 +1,22 @@
-if __name__ == "__main__":
-	import get_data_verifly as gdf
-	import pandas as pd
-	import transform_metrics as tm
-	import datetime
-#
-	bucket = "verifly-adjust"
-#	day = 3
-	save_path = '/home/nick/adjust/data/verifly'
-#	days3 = datetime.date.today() - datetime.timedelta(days = 3)
-#	days2 = datetime.date.today() - datetime.timedelta(days = 2)
 
-	days = [2,3,4,5,6,7,8,9,10,11,12,13,14]
+import get_data_verifly as gdf
+import pandas as pd
+import transform_metrics as tm
+import datetime
+										#
+def gen_data(bucket, num_days, save_path):
+	#bucket = "verifly-adjus"
+	#day = 3
+	#save_path = '/home/nick/adjust/data/verifly'
+
 	metrics = []
 
-	for day in days:
+	for day in range(1,num_days+1):
 		data = gdf.get_data_verifly(bucket, day, save_path)
-		metric = tm.calc_deliverables(data)
-		metrics.append(metric)
+		#metric = tm.calc_deliverables(data)
+		metrics.append(data)
 
 	data_metrics = pd.concat(metrics, ignore_index = True)
-	data_metrics.to_csv('vfly-deliverables.csv')
+	#data_metrics.to_csv('/home/nick/adjust/data/verifly/deliverables/vfly_deliverables_raw.csv')
+	return data_metrics
+
