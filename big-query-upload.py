@@ -6,6 +6,7 @@ if __name__ == "__main__":
 	import get_data_verifly as gdv
 	import metrics
 	import gen_data
+    	from verifly_metrics import merge_data
 
 	'''
 	The main script function called daily via a cron on a google VM.
@@ -32,15 +33,15 @@ if __name__ == "__main__":
 	print("Local path: " + local_path)
 
 	#download old data as dataframe from google big query
-#	dataset_ref = client.dataset(dataset_id).table(table_name_bigquery)
-#	table = client.get_table(dataset_ref)
-#	data_gbq = client.list_rows(table).to_dataframe()
-#	print("Downloading previous data from google big query...")
+	dataset_ref = client.dataset(dataset_id).table(table_name_bigquery)
+	table = client.get_table(dataset_ref)
+	data_gbq = client.list_rows(table).to_dataframe()
+	print("Downloading previous data from google big query...")
 
 
 #	#drop the pandas index that is added when uploading to gbq
-#	data_gbq = data_gbq.iloc[:,1:]
-#	data_prev30 = data[data['date'] < last30]
+	data_gbq = data_gbq.iloc[:,1:]
+	data_last30 = data[data['date'] >= last30]
 
 
 	#details for data extraction
@@ -50,11 +51,14 @@ if __name__ == "__main__":
 
 
 	#download and combine batched data from yesterday
-	data_last30 = gen_data.gen_data(bucket, days, save_path)
+	raw_data_last30 = gen_data.gen_data(bucket, days, save_path)
 #	data_last30.to_csv(local_path + 'vfly_raw_11062019.csv')
 	#transform batched data to metrics and save as csv
-	data_yesterday = metrics.apply_metrics(data_last30)
+	agg_metrics, cohort_metrics = metrics.apply_metrics(raw_data_last30)
 
+    data_last30_and_aggmetrics = data_last30.append(agg_metrics, ignore_index=True)
+    
+    final_data = merge_data(data_last_30_and_aggmetrics, cohort_metrics)
 	#combine the two csv files. data was saved as csv as a poor solution to merging a multiindexed dataframe
 #	data_gbq = pd.read_csv('/home/nick/adjust/data/verifly/deliverables/vfly-deliverables.csv')
 #	data_gbq = data_gbq.iloc[:,1:]
@@ -74,8 +78,9 @@ if __name__ == "__main__":
 
 #	data_full = data_full.set_index('date')
 	#save the dataframe as local file
-	data_yesterday.to_csv(local_path)
-#
+#	data_yesterday.to_csv(local_path)
+
+    final_data.to_csv(local_path)
 #	#try to delete previous table. if failed catch the fail and notify
 #	try:
 #		print("Trying to delete..." + table_name_bigquery)

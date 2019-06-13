@@ -5,15 +5,11 @@ def apply_metrics(data):
 
     # Preprocess + AGG_METRICS + COHORT_METRICS
     data = data_processing(data)
+    data_with_id = data[~data.random_user_id.isna()]
     agg_met, yesterday_date = calc_deliverables(data)
     cohort_met = total_revenue_cohort(data)
 
-    # Concatenate both dataframes 
-    final_dataframe = pd.concat([agg_met, cohort_met], axis=1)
-    final_dataframe['date'] = yesterday_date
-    final_dataframe = final_dataframe.reset_index()
+    agg_met['date'] = yesterday_date 
+    return agg_met, cohort_met
 
-#    last_day = final_dataframe.date.max()   
-#    last_day_data = final_dataframe[final_dataframe.date == last_day]
-
-    return final_dataframe
+    
