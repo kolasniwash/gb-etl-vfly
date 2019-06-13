@@ -58,7 +58,7 @@ def data_processing(data):
     data.columns = data.columns.str.replace('{','').str.replace('}',"")
     
     # drop Unnamed 0 column
-    data = data.drop(['Unnamed: 0'], axis=1)
+    #data = data.drop(['Unnamed: 0'], axis=1)
 
     #in the events column, test each element if it matches one of the token headers. If yes, assign True to the specific token's column.
     for title, token in zip(event_titles, event_tokens):
@@ -117,24 +117,28 @@ def calc_deliverables(data):
                     'uaxeoa', 'k32fim', 'x44bbh', '15300u', 'pcfbpu', 'fwxse7', 'aawkuo', '9gbbae']
     event_headers = ['e_' + token for token in event_tokens]
     rev_metrics = ['impression', 'event', 'session', 'install', 'click', 'install_update', 'reattribution', 'revenue']
-    grouping = ['date', 'network_name', 'campaign_name', 'adgroup_name', 'creative_name', 'region', 'os_name']
+
+#grouping without date.slice data using dau/wau/mau
+    grouping = ['tracker', 'network_name', 'campaign_name', 'adgroup_name', 'creative_name', 'region', 'os_name']
 
     all_metrics = rev_metrics + [title + ' (' + header + ')' for title, header in zip(event_titles, event_headers)]
 
     
     #calculating main metrics
-    agg_metrics = data.groupby(grouping)[all_metrics].apply(lambda x : x.sum())
+#    agg_metrics = data.groupby(grouping)[all_metrics].apply(lambda x : x.sum())
  
-    today = datetime.date.today()
-    dau_bound_date = str((today + datetime.timedelta(days = -1)))
-    wau_bound_date = str((today + datetime.timedelta(days = -7)))
-    mau_bound_date = str((today + datetime.timedelta(days = -30)))
-    upper_bound_date = str(today)
+    yesterday = (datetime.date.today() + datetime.timedelta(days = -1))
+    dau_bound_date = str((yesterday + datetime.timedelta(days = -1)))
+    wau_bound_date = str((yesterday + datetime.timedelta(days = -7)))
+    mau_bound_date = str((yesterday + datetime.timedelta(days = -30)))
+    upper_bound_date = str(yesterday)
 
     # returns a filtered dataframe
     dau = data[data.date.between(dau_bound_date, upper_bound_date)]
     wau = data[data.date.between(wau_bound_date, upper_bound_date)]
     mau = data[data.date.between(mau_bound_date, upper_bound_date)]
+
+    agg_metrics = data.groupby(grouping)[all_metrics].apply(lambda x : x.sum())
 
     unique_dau = dau.groupby(grouping).agg({'random_user_id': 'nunique'})
     unique_wau = wau.groupby(grouping).agg({'random_user_id': 'nunique'})
@@ -148,7 +152,7 @@ def calc_deliverables(data):
 
     final_dataframe.update(final_dataframe[['dau','wau','mau']].fillna(0))
 
-    return final_dataframe
+    return final_dataframe, upper_bound_date
 
 
 def total_revenue_cohort(data):
@@ -158,7 +162,7 @@ def total_revenue_cohort(data):
     data['CohortGroup'] = data.groupby(level=0)['date'].min().apply(lambda x: x.strftime('%Y-%m-%d'))
     data.reset_index(inplace=True)
     
-    grouping = ['date', 'network_name', 'campaign_name', 'adgroup_name', 'creative_name', 'region', 'os_name']
+    grouping = ['tracker', 'network_name', 'campaign_name', 'adgroup_name', 'creative_name', 'region', 'os_name']
 
     grouped_data = data.groupby(grouping)
 

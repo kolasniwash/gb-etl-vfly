@@ -1,7 +1,6 @@
 
 import get_data_verifly as gdf
 import pandas as pd
-import transform_metrics as tm
 import datetime
 										#
 def gen_data(bucket, num_days, save_path):
@@ -13,7 +12,6 @@ def gen_data(bucket, num_days, save_path):
 
 	for day in range(1,num_days+1):
 		data = gdf.get_data_verifly(bucket, day, save_path)
-		#metric = tm.calc_deliverables(data)
 		metrics.append(data)
 
 	data_metrics = pd.concat(metrics, ignore_index = True)
