@@ -1,6 +1,6 @@
 ## Automated pipeline to transform batched data into kpis
 
-This project automated the retreval and processing of batched data from adjust.
+This project automated the retreval and processing of batched data from adjust. Operating in google cloud platform.
 
 Summary of project's functions.
 
