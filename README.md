@@ -1,4 +1,4 @@
-## ETL pipeline from batched data
+## Automated pipeline to transform batched data into kpis
 
 This project automated the retreval and processing of batched data from adjust.
 
